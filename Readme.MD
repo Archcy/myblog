@@ -1,5 +1,5 @@
 # myblog
-A light weight blog system relay github pages  
+A light weight blog system for github pages  
 
 ## Features
 1. myblog uses github pages to host your blog,it dose't need extra Auth
