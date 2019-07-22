@@ -51,10 +51,10 @@ ______________________________________________
 It still has a Very Long Way to Go
 
 ### Version Support
-current version 0.0.1
-|explore|edit in myblog|comment|
-|-------|--------------|-------|
-|   Y   |      N       |   N   |
+current version : 0.0.1  
+explore: True  
+edit in blog: False  
+comment in blog: False  
 
 ### Todos
 1. beautify
