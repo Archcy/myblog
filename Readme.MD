@@ -29,11 +29,11 @@ Your MarkDown files need to be named as below rules
 ```
 Order .+ ${tags} .+ Name +'.md'
 ```
-```Order``` is like year-month-day-[order of blog in that day]
-such as ```2019-01-12-2.Readme.md ```
-```Order``` is bigger, it will be more advanced 
-```${tags}``` is optional,it should be writed like this ```{tag1,tag2,tag3...}``` 
-amount of tags should better be less than 4  
+```Order``` is like year-month-day-[order of blog in that day]  
+such as ```2019-01-12-2.Readme.md ```  
+```Order``` is bigger, it will be more advanced   
+```${tags}``` is optional,it should be writed like this ```{tag1,tag2,tag3...}```   
+amount of tags should better be less than 4   
 such as ``` 2019-02-21-1.{compiler,c++}.StackVM.md```
 
 
