@@ -11,6 +11,9 @@
           <div hidden="true">{{ view(blog['download_url'],blog['name'])}}</div>
         </div>
         <div class="viewall">
+          <div class="tags" v-for="tag in blog['tags']" :key="tag">
+            {{tag}}
+          </div>
           <button @click="gotoreader(blog['url'])">More</button>
         </div>
       </div>
@@ -43,12 +46,17 @@ export default {
     Blogs_per_Page: {
       type: Number,
       required: true
+    },
+    Blogs_per_Day: {
+      type: Number,
+      required: true
     }
   },
   data() {
     return {
       blogs: [],
       currentblogs: [],
+      mdtags: [],
       editormd: new showdown.Converter({
         tables: true,
         strikethrough: true
@@ -88,32 +96,56 @@ export default {
     }
   },
   methods: {
-    initlist(UserName, ProjectName, Blogs_per_Page) {
+    initlist(UserName, ProjectName, Blogs_per_Page, Blogs_per_Day) {
       const urlhead = "https://api.github.com/repos/",
         urltail = "/contents/MarkDown";
-      axios
-        .get(urlhead + UserName + "/" + ProjectName + urltail)
-        .then(Response => {
-          const tarray = Response.data;
-          tarray.forEach(element => {
-            let tmp = {};
-            let nnf = element["name"].split(".");
-            tmp["index"] = 65535 - parseInt(nnf[0]);
-            tmp["name"] = nnf[1];
-            tmp["url"] = element["name"];
-            tmp["download_url"] = element["download_url"];
-            this.blogs.push(tmp);
+      try {
+        axios
+          .get(urlhead + UserName + "/" + ProjectName + urltail)
+          .then(Response => {
+            const tarray = Response.data;
+            tarray.forEach(element => {
+              let tmp = {};
+              let tmpele = element["name"].split(/[.]/);
+              let time = tmpele[0].split(/-/);
+              let index = 0;
+              if (time.length > 3) {
+                index =
+                  (37200 * this.Blogs_per_Day -
+                  ((parseInt(time[0]) - 2000) * 12 + parseInt(time[1]) * 31 + parseInt(time[2])) *
+                    this.Blogs_per_Day -
+                  parseInt(time[3]));
+              } else {
+                index = tmpele[0];
+              }
+              let tags = element["name"].match(/\{[^]+\}/);
+              if (tags) {
+                tags = tags.toString();
+                tags = tags.substr(1, tags.length - 2).split(/,/);
+                tmp["name"] = tmpele[2];
+              } else {
+                tags = [];
+                tmp["name"] = tmpele[1];
+              }
+              tmp["index"] = index;
+              tmp["tags"] = tags;
+              tmp["url"] = element["name"];
+              tmp["download_url"] = element["download_url"];
+              this.blogs.push(tmp);
+            });
+            this.blogs.sort((a, b) => {
+              return a.index - b.index;
+            });
+            this.len = this.blogs.length;
+            this.pageNum = Math.ceil(this.len / Blogs_per_Page);
+            this.gotopage(this.$data.currentPage);
           });
-          this.blogs.sort((a, b) => {
-            return a.index - b.index;
-          });
-          this.len = this.blogs.length;
-          this.pageNum = Math.ceil(this.len / Blogs_per_Page);
-          this.gotopage(this.$data.currentPage);
-        });
+      } catch (err) {
+        alert("Unable to Get Filelist,May be reach API Limt");
+      }
     },
     list(Data, Blogs_per_Page, current, len) {
-      document.documentElement.scrollTo(0, 0);
+      window.scrollTo(0, 0);
       this.currentblogs = [];
       for (
         let i = 0;
@@ -125,11 +157,15 @@ export default {
       this.currentPage = current;
     },
     async view(url, id) {
-      axios.get(url).then(Response => {
-        document.getElementById(id).innerHTML = this.$data.editormd.makeHtml(
-          Response["data"].substr(0, 128)
-        );
-      }); //Lazy
+      try {
+        axios.get(url).then(Response => {
+          document.getElementById(id).innerHTML = this.$data.editormd.makeHtml(
+            Response["data"].substr(0, 128)
+          );
+        }); //Lazy
+      } catch (err) {
+        alert("exec error");
+      }
     },
     gotoreader(id) {
       this.$router.push({ path: "./", query: { pid: id } });
@@ -223,8 +259,23 @@ export default {
   float: right;
   position: relative;
   right: 2rem;
-  top: 30px;
+  top: 2rem;
   margin: 0px auto;
+}
+
+.block .viewall .tags{
+  float:left;
+  font-size: 16px;
+  opacity: 0.8;
+  padding: 0.2rem 1rem;
+  width: 5rem;
+  height: 1.8rem;
+  border-radius: 1rem;
+  margin: 1rem 1rem;
+  color: black;
+  background-color: #dedede;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 #ind {
@@ -248,11 +299,11 @@ export default {
 }
 
 button {
-  font-size: 15px;
+  font-size: 1rem;
   border: none;
-  height: 40px;
-  width: 80px;
-  border-radius: 30px;
+  height: 2.8rem;
+  width: 6rem;
+  border-radius: 3rem;
   background-color: var(--main_color);
   color: var(--second_color);
 }

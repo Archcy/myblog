@@ -31,7 +31,7 @@ export default {
     };
   },
   mounted() {
-    document.documentElement.scrollTo(0,0);
+    window.scrollTo(0, 0);
     const mobile = navigator.userAgent.match(/(phone|iPhone|iPod|ios|Android|Mobile|BrowserNG|WebOS|Symbian|Windows Phone)/i);
     const deviceWidth = document.documentElement.clientWidth;
     if(mobile)

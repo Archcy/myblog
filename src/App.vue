@@ -1,7 +1,13 @@
 <template>
   <div id="app">
     <navbar :title="Blogtitle" />
-    <index v-if="!this.$route.query.pid" :UserName="UserName" :ProjectName="ProjectName" :Blogs_per_Page="Blogs_per_Page" />
+    <index
+      v-if="!this.$route.query.pid"
+      :UserName="UserName"
+      :ProjectName="ProjectName"
+      :Blogs_per_Page="Blogs_per_Page"
+      :Blogs_per_Day="Blogs_per_Day"
+    />
     <mdreader v-if="this.$route.query.pid" :UserName="UserName" :ProjectName="ProjectName" />
     <foot />
   </div>
@@ -23,10 +29,11 @@ export default {
   },
   data() {
     return {
-      Blogtitle: "MyBlog", //Your blog title
+      Blogtitle: "Archcy's Blog", //Your blog title
       UserName: "Archcy", // Your Github UserName
       ProjectName: "Archcy.github.io", // Your Project Name
-      Blogs_per_Page: 4 //default is 4
+      Blogs_per_Page: 4, //default is 4
+      Blogs_per_Day: 100 //default is 100
     };
   }
 };
