@@ -15,8 +15,8 @@ Which you shoud name the file as Order + TitleName +'.md'
 ### How to use
 1. Setup a github pages ([Howto?](https://pages.github.com/))
 2. clone myblog to your local storage
-3. Configure your username and project name in /router.js
-4. Configure your blog name in /App.vue
+3. Configure your username and project name in /App.vue
+4. Set your blog title in /App.vue
 5. Setup project by run ``` npm install```
 6. build the project by run ``` npm rum build```
 7. copy /dist to your github pages project dictionary
@@ -42,9 +42,9 @@ ___________________________________________
 |    |           |
 |    |           |-----/Pic #You can Store Pictures here(or not)
 |    |    
-|    ||--App.vue #change your blog title here
-| /---|
-|     |--router.js #set Your UserName and Project Name Here
+|    |
+| /--|--App.vue #change your settings here
+|   
 |
 ______________________________________________
 ```

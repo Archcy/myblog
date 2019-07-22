@@ -20,7 +20,7 @@
         class="pageind"
         v-for="index in pageNum"
         :key="index"
-        @click="gotopage(index)"
+        @click="list(blogs, Blogs_per_Page, index, len)"
         :style="Getindcolor(index,currentPage)"
       >{{index}}</button>
     </div>
@@ -69,9 +69,6 @@ export default {
     } else if (deviceWidth > 1000) {
       document.getElementById("blog").style.width = "750px";
     }
-    if (this.$route.query.page) {
-      this.$data.currentPage = this.$route.query.page;
-    }
     this.initlist(
       this.$props.UserName,
       this.$props.ProjectName,
@@ -109,11 +106,13 @@ export default {
           });
           this.len = this.blogs.length;
           this.pageNum = Math.ceil(this.len / Blogs_per_Page);
-          this.gotopage(this.$data.currentPage);
+          for (let i = 0; i < Blogs_per_Page && i < this.len; i++) {
+            this.currentblogs.push(this.blogs[i]);
+          }
         });
     },
     list(Data, Blogs_per_Page, current, len) {
-      document.documentElement.scrollTo(0, 0);
+      document.documentElement.scrollTo(0,0);
       this.currentblogs = [];
       for (
         let i = 0;
@@ -132,23 +131,19 @@ export default {
       }); //Lazy
     },
     gotoreader(id) {
-      this.$router.push({ path: "./", query: { pid: id } });
+      this.$router.push({ path: "article", query: { pid: id } });
     },
     Getindcolor(ind, currentPage) {
       if (ind == currentPage) {
         return "background-color:var(--second_color);color:var(--main_color);";
       }
-    },
-    gotopage(index) {
-      this.$router.push({ path: "./", query: { page: index } });
-      this.list(this.blogs, this.Blogs_per_Page, index, this.len);
     }
   }
 };
 </script>
 <style scoped>
 #blog {
-  margin: 0 auto;
+  margin:0 auto;
   margin-top: -8rem;
   margin-bottom: -10rem;
   width: 86%;

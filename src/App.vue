@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <navbar :title="Blogtitle" />
-    <template v-if="$route.matched.length"></template>
-    <router-view></router-view>
+    <index v-if="!this.$route.query.pid" :UserName="UserName" :ProjectName="ProjectName" :Blogs_per_Page="Blogs_per_Page" />
+    <mdreader v-if="this.$route.query.pid" :UserName="UserName" :ProjectName="ProjectName" />
     <foot />
   </div>
 </template>
@@ -10,22 +10,28 @@
 <script>
 import navbar from "./components/nav.vue";
 import foot from "./components/foot.vue";
+import index from "./components/index.vue";
+import mdreader from "./components/article.vue";
 
 export default {
   name: "app",
   components: {
     navbar,
-    foot
+    foot,
+    index,
+    mdreader
   },
   data() {
     return {
-      Blogtitle: "MyBlog", //Your blog title 
+      Blogtitle: "MyBlog", //Your blog title
+      UserName: "Archcy", // Your Github UserName
+      ProjectName: "Archcy.github.io", // Your Project Name
+      Blogs_per_Page: 4 //default is 4
     };
   }
 };
 </script>
 <style src="./css/github-markdow.css">
-
 </style>
 
 <style>
