@@ -1,6 +1,6 @@
 # myblog
 A light weight blog system for github pages  
-
+example [here](https://archcy.github.io/)
 ## Features
 1. myblog uses github pages to host your blog,it dose't need extra Auth
 2. myblog dsen't need you to build pages when you write a blog,you can edit Your blogs in ${Project}/MarkDown/  
