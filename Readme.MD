@@ -1,5 +1,6 @@
 # myblog
-A light weight blog system for github pages  
+A light weight blog system for github pages 
+## This is a very early version,it may changed a lot   
 example [here](https://archcy.github.io/)
 ## Features
 1. myblog uses github pages to host your blog,it dose't need extra Auth
