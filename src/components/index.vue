@@ -11,7 +11,7 @@
           <div hidden="true">{{ view(blog['download_url'],blog['name'])}}</div>
         </div>
         <div class="viewall">
-          <div class="tags" v-for="tag in blog['tags']" :key="tag">
+          <div class="tags" v-show="!mobile" v-for="tag in blog['tags']" :key="tag">
             {{tag}}
           </div>
           <button @click="gotoreader(blog['url'])">More</button>
@@ -64,15 +64,16 @@ export default {
       pos: 0,
       len: 0,
       pageNum: 1,
-      currentPage: 1
+      currentPage: 1,
+      mobile:0
     };
   },
   mounted() {
-    const mobile = navigator.userAgent.match(
+    this.$data.mobile = navigator.userAgent.match(
       /(phone|iPhone|iPod|ios|Android|Mobile|BrowserNG|WebOS|Symbian|Windows Phone)/i
     );
     const deviceWidth = document.documentElement.clientWidth;
-    if (mobile) {
+    if (this.$data.mobile) {
       document.getElementById("blog").style.width = "94%";
     } else if (deviceWidth > 1000) {
       document.getElementById("blog").style.width = "750px";
@@ -96,7 +97,7 @@ export default {
     }
   },
   methods: {
-    initlist(UserName, ProjectName, Blogs_per_Page, Blogs_per_Day) {
+    initlist(UserName, ProjectName, Blogs_per_Page) {
       const urlhead = "https://api.github.com/repos/",
         urltail = "/contents/MarkDown";
       try {
@@ -265,10 +266,10 @@ export default {
 
 .block .viewall .tags{
   float:left;
-  font-size: 16px;
+  font-size: 1rem;
   opacity: 0.8;
   padding: 0.2rem 1rem;
-  width: 5rem;
+  width: 3rem;
   height: 1.8rem;
   border-radius: 1rem;
   margin: 1rem 1rem;
