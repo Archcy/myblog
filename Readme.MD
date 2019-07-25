@@ -7,8 +7,9 @@ example [here](https://archcy.github.io/)
 ## Features
 1. myblog uses github pages to host your blog,it dose't need extra Auth
 2. myblog dsen't need you to build pages when you write a blog,you can edit Your blogs in ${Project}/MarkDown/  
-Which you shoud name the file as Order + TitleName +'.md'
+Which you shoud name the file as Order + tags + TitleName +'.md'
 3. myblog supports self-adoption (PC and Mobile)
+4. myblog supports classified by tags
 
 ###  About
 1. myblog is build from scratch,so it may have bugs.
@@ -58,12 +59,13 @@ ______________________________________________
 It still has a Very Long Way to Go
 
 ### Version Support
-current version : 0.0.1f5  
+current version : 0.0.2  
 explore: True  
+tags: True
 edit in blog: False  
 comment in blog: False  
 
 ### Todos
-1. beautify
+1. beautify 
 2. support for editing
 3. support for highligt

@@ -1,20 +1,39 @@
 <template>
   <div id="blog">
-    <div id="list">
-      <div v-show="currentblogs.length==0" style="text-align:center">
-        <h1>Loading...</h1>
-      </div>
-      <div class="block" v-for="blog in currentblogs " :key="blog['index']">
-        <div class="title">{{blog['name'] }}</div>
-        <div class="markdown-body" :id="blog['name']">
-          <h1>Loading...</h1>
-          <div hidden="true">{{ view(blog['download_url'],blog['name'])}}</div>
+    <div style="box-shadow: 0 8px 16px darkgray;">
+      <div id="thetagme">
+        <div id="thetags" :style="viewtags">
+          <button
+            class="thetag"
+            v-for="(value,key) in mdtagsindex"
+            :key="key"
+            @click="selecttagview(key)"
+            :style="Getindcolor(0,mdtagsindex[key])"
+          >{{key}}</button>
+          <div style="clear:both"></div>
         </div>
-        <div class="viewall">
-          <div class="tags" v-show="!mobile" v-for="tag in blog['tags']" :key="tag">
-            {{tag}}
+        <div id="tagviewall" v-if="0" @click="tagview()">V</div>
+      </div>
+      <div id="list">
+        <div v-show="currentblogs.length==0" style="text-align:center">
+          <h1>Loading...</h1>
+        </div>
+        <div class="block" v-for="blog in currentblogs " :key="blog['index']">
+          <div class="title">{{blog['name'] }}</div>
+          <div class="markdown-body" :id="blog['name']">
+            <h1>Loading...</h1>
+            <div hidden="true">{{ view(blog['download_url'],blog['name'])}}</div>
           </div>
-          <button @click="gotoreader(blog['url'])">More</button>
+          <div class="viewall">
+            <button
+              class="thetag"
+              v-for="tag in blog['tags']"
+              :key="tag"
+              :style="Getindcolor(0,mdtagsindex[tag])"
+              @click="selecttagview(tag)"
+            >{{tag}}</button>
+            <button id="gotoread" @click="gotoreader(blog['url'])">More</button>
+          </div>
         </div>
       </div>
     </div>
@@ -56,7 +75,7 @@ export default {
     return {
       blogs: [],
       currentblogs: [],
-      mdtags: [],
+      mdtagsindex: {},
       editormd: new showdown.Converter({
         tables: true,
         strikethrough: true
@@ -65,7 +84,9 @@ export default {
       len: 0,
       pageNum: 1,
       currentPage: 1,
-      mobile:0
+      mobile: 0,
+      viewtags: null,
+      selected: []
     };
   },
   mounted() {
@@ -83,21 +104,16 @@ export default {
     }
     this.initlist(
       this.$props.UserName,
-      this.$props.ProjectName,
-      this.$props.Blogs_per_Page
+      this.$props.ProjectName
     );
   },
-  filters: {
-    customOrder(list) {
-      let first = list.shift();
-      let last = list.pop();
-      list.push(first);
-      list.push(last);
-      return list;
+  watch: {
+    FNowID: function(newVal) {
+      this.FNowID = newVal;
     }
   },
   methods: {
-    initlist(UserName, ProjectName, Blogs_per_Page) {
+    initlist(UserName, ProjectName) {
       const urlhead = "https://api.github.com/repos/",
         urltail = "/contents/MarkDown";
       try {
@@ -112,10 +128,12 @@ export default {
               let index = 0;
               if (time.length > 3) {
                 index =
-                  (37200 * this.Blogs_per_Day -
-                  ((parseInt(time[0]) - 2000) * 12 + parseInt(time[1]) * 31 + parseInt(time[2])) *
+                  37200 * this.Blogs_per_Day -
+                  ((parseInt(time[0]) - 2000) * 12 +
+                    parseInt(time[1]) * 31 +
+                    parseInt(time[2])) *
                     this.Blogs_per_Day -
-                  parseInt(time[3]));
+                  parseInt(time[3]);
               } else {
                 index = tmpele[0];
               }
@@ -132,21 +150,27 @@ export default {
               tmp["tags"] = tags;
               tmp["url"] = element["name"];
               tmp["download_url"] = element["download_url"];
+              tags.forEach(tag => {
+                if (!this.mdtagsindex[tag]) {
+                  this.mdtagsindex[tag] = 0;
+                }
+              });
               this.blogs.push(tmp);
             });
             this.blogs.sort((a, b) => {
               return a.index - b.index;
             });
-            this.len = this.blogs.length;
-            this.pageNum = Math.ceil(this.len / Blogs_per_Page);
             this.gotopage(this.$data.currentPage);
           });
       } catch (err) {
         alert("Unable to Get Filelist,May be reach API Limt");
       }
     },
-    list(Data, Blogs_per_Page, current, len) {
+    list(input, Blogs_per_Page, current) {
       window.scrollTo(0, 0);
+      let Data = this.tagged(input),
+        len = Data.length;
+      this.pageNum = Math.ceil(len / Blogs_per_Page);
       this.currentblogs = [];
       for (
         let i = 0;
@@ -171,14 +195,52 @@ export default {
     gotoreader(id) {
       this.$router.push({ path: "./", query: { pid: id } });
     },
-    Getindcolor(ind, currentPage) {
-      if (ind == currentPage) {
-        return "background-color:var(--second_color);color:var(--main_color);";
+    Getindcolor(ind, one) {
+      if (ind == one) {
+        return "background-color:#eee;color:var(--main_color);";
+      } else {
+        return "background-color:var(--main_color);color:var(--second_color);";
       }
     },
     gotopage(index) {
       this.$router.push({ path: "./", query: { page: index } });
-      this.list(this.blogs, this.Blogs_per_Page, index, this.len);
+      this.list(this.blogs, this.Blogs_per_Page, index);
+    },
+    tagview() {
+      if (this.$data.viewtags == null) this.$data.viewtags = "height:4.5rem;";
+      else this.$data.viewtags = null;
+    },
+    selecttagview(tag) {
+      if (this.$data.mdtagsindex[tag] == 0) this.$data.mdtagsindex[tag] = 1;
+      else this.$data.mdtagsindex[tag] = 0;
+      this.gotopage(1);
+    },
+    tagged(inputs) {
+      if (inputs) {
+        let flag = 1;
+        for (let ttag in this.$data.mdtagsindex) {
+          if (this.$data.mdtagsindex[ttag] == 1) {
+            flag = 0;
+          }
+        }
+        if (!flag) {
+          let tmptaglist = [];
+          for (let ttag in this.$data.mdtagsindex) {
+            if (this.$data.mdtagsindex[ttag] == 1) {
+              tmptaglist.push(ttag);
+            }
+          }
+          return inputs.filter(function(input) {
+            for (let value in tmptaglist) {
+              if (input.tags.indexOf(tmptaglist[value]) != -1) {
+                return input;
+              }
+            }
+          });
+        } else {
+          return inputs;
+        }
+      }
     }
   }
 };
@@ -191,6 +253,50 @@ export default {
   width: 86%;
   padding: 3%;
 }
+
+#thetagme {
+  min-height: 3rem;
+  width: 100%;
+  background-color: var(--second_color);
+  overflow: hidden;
+}
+
+#tagviewall {
+  position: relative;
+  height: 1.5rem;
+  padding-top: 0.5rem;
+  border-radius: 1rem;
+  width: 10rem;
+  margin: 0 auto;
+  margin-top: -0.5rem;
+  clear: both;
+  background-color: var(--main_color);
+  color: var(--second_color);
+  text-align: center;
+}
+#tagviewall:hover {
+  cursor: pointer;
+}
+
+#thetags {
+  background-color: #fff;
+  height: 3rem;
+  width: 100%;
+  overflow: hidden;
+}
+.thetag {
+  float: left;
+  width: 5rem;
+  height: 2rem;
+  text-align: center;
+  border-radius: 2rem;
+  margin: 0.5rem 0.6rem;
+  overflow: hidden;
+}
+.thetag:hover {
+  cursor: pointer;
+}
+
 #list {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -201,7 +307,6 @@ export default {
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-size: 2rem;
-  box-shadow: 0 8px 16px darkgray;
 }
 
 .block {
@@ -226,7 +331,6 @@ export default {
 }
 
 .block .title {
-  position: relative;
   height: 30px;
   font-size: 1.4rem;
   color: #fff;
@@ -235,7 +339,6 @@ export default {
   text-overflow: ellipsis;
 }
 .block .markdown-body {
-  position: relative;
   height: 190px;
   font-size: 1rem;
   border-radius: 0px 0px 5px 5px;
@@ -246,26 +349,28 @@ export default {
 .block .viewall {
   margin-top: -90px;
   padding: 0;
-  position: relative;
   bottom: 0px;
   height: 90px;
   width: 100%;
+  position: relative;
   background: linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0.3),
     rgba(255, 255, 255, 1)
   );
 }
-.block .viewall button {
+#gotoread {
   float: right;
-  position: relative;
+  position: absolute;
   right: 2rem;
-  top: 2rem;
+  bottom: 2rem;
   margin: 0px auto;
+  z-index: 4;
+
 }
 
-.block .viewall .tags{
-  float:left;
+.block .viewall .tags {
+  float: left;
   font-size: 1rem;
   opacity: 0.8;
   padding: 0.2rem 1rem;

@@ -43,8 +43,10 @@ export default {
 
 <style>
 :root {
+  --head_color: #24292e;
   --main_color: #24292e;
   --second_color: #f5f5f5;
+  --foot-color: #000;
 }
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;

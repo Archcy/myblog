@@ -27,7 +27,7 @@ export default {
 
 <style scoped>
 #head {
-  background-color: var(--main_color);
+  background-color: var(--head_color);
   width: 100%;
   height: 14rem;
   margin: 0 auto;
@@ -36,7 +36,7 @@ export default {
 #navbar {
   margin: 0 auto;
   position: relative;
-  top: 2rem;
+  top: 1rem;
   background-color: #fff;
   width: 400px;
   height: 3rem;
