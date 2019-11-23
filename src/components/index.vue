@@ -1,5 +1,8 @@
 <template>
   <div id="blog">
+    <div id="search">
+      <input v-model="searchtext" @input="gotopage(1)" id="input" />
+    </div>
     <div style="box-shadow: 0 8px 16px darkgray;">
       <div id="thetagme">
         <div id="thetags" :style="viewtags">
@@ -8,7 +11,7 @@
             v-for="(value,key) in mdtagsindex"
             :key="key"
             @click="selecttagview(key)"
-            :style="Getindcolor(0,mdtagsindex[key])"
+            :style="Getindcolor(1,mdtagsindex[key])"
           >{{key}}</button>
           <div style="clear:both"></div>
         </div>
@@ -29,10 +32,10 @@
               class="thetag"
               v-for="tag in blog['tags']"
               :key="tag"
-              :style="Getindcolor(0,mdtagsindex[tag])"
+              :style="Getindcolor(1,mdtagsindex[tag])"
               @click="selecttagview(tag)"
             >{{tag}}</button>
-            <button id="gotoread" @click="gotoreader(blog['url'])">More</button>
+            <button id="gotoread" @click="gotoreader(blog['url'])">></button>
           </div>
         </div>
       </div>
@@ -86,7 +89,8 @@ export default {
       currentPage: 1,
       mobile: 0,
       viewtags: null,
-      selected: []
+      selected: [],
+      searchtext: ""
     };
   },
   mounted() {
@@ -102,10 +106,7 @@ export default {
     if (this.$route.query.page) {
       this.$data.currentPage = this.$route.query.page;
     }
-    this.initlist(
-      this.$props.UserName,
-      this.$props.ProjectName
-    );
+    this.initlist(this.$props.UserName, this.$props.ProjectName);
   },
   watch: {
     FNowID: function(newVal) {
@@ -152,7 +153,7 @@ export default {
               tmp["download_url"] = element["download_url"];
               tags.forEach(tag => {
                 if (!this.mdtagsindex[tag]) {
-                  this.mdtagsindex[tag] = 0;
+                  this.mdtagsindex[tag] = 1;
                 }
               });
               this.blogs.push(tmp);
@@ -168,7 +169,7 @@ export default {
     },
     list(input, Blogs_per_Page, current) {
       window.scrollTo(0, 0);
-      let Data = this.tagged(input),
+      let Data = this.filted(input),
         len = Data.length;
       this.pageNum = Math.ceil(len / Blogs_per_Page);
       this.currentblogs = [];
@@ -197,9 +198,9 @@ export default {
     },
     Getindcolor(ind, one) {
       if (ind == one) {
-        return "background-color:#eee;color:var(--main_color);";
-      } else {
         return "background-color:var(--main_color);color:var(--second_color);";
+      } else {
+        return "background-color:var(--second_color);color:var(--main_color);";
       }
     },
     gotopage(index) {
@@ -215,43 +216,57 @@ export default {
       else this.$data.mdtagsindex[tag] = 0;
       this.gotopage(1);
     },
-    tagged(inputs) {
+    filted(inputs) {
       if (inputs) {
-        let flag = 1;
+        let tmptaglist = [];
+        let searchtext = this.$data.searchtext;
         for (let ttag in this.$data.mdtagsindex) {
           if (this.$data.mdtagsindex[ttag] == 1) {
-            flag = 0;
+            tmptaglist.push(ttag);
           }
         }
-        if (!flag) {
-          let tmptaglist = [];
-          for (let ttag in this.$data.mdtagsindex) {
-            if (this.$data.mdtagsindex[ttag] == 1) {
-              tmptaglist.push(ttag);
+        return inputs.filter(function(input) {
+          for (let value in tmptaglist) {
+            if (
+              input.tags.indexOf(tmptaglist[value]) != -1 &&
+              input.name.search(searchtext) != -1
+            ) {
+              return input;
             }
           }
-          return inputs.filter(function(input) {
-            for (let value in tmptaglist) {
-              if (input.tags.indexOf(tmptaglist[value]) != -1) {
-                return input;
-              }
-            }
-          });
-        } else {
-          return inputs;
-        }
+        });
+      } else {
+        return inputs;
       }
     }
   }
 };
 </script>
 <style scoped>
+#search {
+  background-color: var(--head_color);
+  width: 100%;
+  height: 3.5rem;
+  overflow: hidden;
+}
+
+#input {
+  display: block;
+  background-color: var(--second_color);
+  border: none;
+  padding: 0rem 1rem;
+  margin: 0.5rem auto;
+  height: 2.5rem;
+  width: 60%;
+  border-radius: 3rem;
+  opacity: 0.9;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
 #blog {
   margin: 0 auto;
-  margin-top: -8rem;
-  margin-bottom: -10rem;
   width: 86%;
-  padding: 3%;
+  padding: 2%;
 }
 
 #thetagme {
@@ -319,10 +334,6 @@ export default {
   margin: 1rem auto;
   box-shadow: 0 8px 16px darkgray;
 }
-.block:hover {
-  animation: bigger 0.3s;
-  animation-fill-mode: forwards;
-}
 .block div {
   padding: 10px 5%;
   margin: 0px;
@@ -353,20 +364,17 @@ export default {
   height: 90px;
   width: 100%;
   position: relative;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 1)
-  );
+  background: rgba(255, 255, 255, 0.3);
 }
+
 #gotoread {
   float: right;
+  width: 2.8rem;
   position: absolute;
   right: 2rem;
   bottom: 2rem;
   margin: 0px auto;
-  z-index: 4;
-
+  z-index: 3;
 }
 
 .block .viewall .tags {
@@ -378,17 +386,17 @@ export default {
   height: 1.8rem;
   border-radius: 1rem;
   margin: 1rem 1rem;
-  color: black;
-  background-color: #dedede;
+  color: var(--second_color);
+  background-color: var(--second_color);
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
 #ind {
   height: 3rem;
-  margin: 0 auto;
   width: 100%;
   bottom: 1rem;
+  background-color: #fefefe;
 }
 
 .pageind {
@@ -397,10 +405,9 @@ export default {
   width: 2rem;
   height: 2rem;
   font-size: 1rem;
-  margin: 1rem 0.5rem;
-  color: var(--second_color);
-  background-color: var(--main_color);
-  border-radius: 3px;
+  margin: 0.5rem 0.5rem;
+  color: var(--main_color);
+  background-color: var(--second_color);
   float: left;
 }
 

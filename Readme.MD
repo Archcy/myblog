@@ -59,13 +59,11 @@ ______________________________________________
 It still has a Very Long Way to Go
 
 ### Version Support
-current version : 0.0.2  
+current version : 0.0.3
 explore: True  
 tags: True
-edit in blog: False  
+edit in blog: U can edit blog by Github markdown editor
 comment in blog: False  
 
 ### Todos
-1. beautify 
-2. support for editing
-3. support for highligt
+1. support for editing

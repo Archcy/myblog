@@ -1,7 +1,10 @@
 <template>
   <div id="reader">
-    <div class="markdown-body" v-html="inner"></div>
-    <button id="goback" @click="goback()">Back to Blogs</button>
+    <div id="title">{{this.$route.query.pid }}</div>
+    <div id="content">
+      <div class="markdown-body" v-html="inner"></div>
+      <button id="goback" @click="goback()"><</button>
+    </div>
   </div>
 </template>
 <script>
@@ -32,12 +35,13 @@ export default {
   },
   mounted() {
     window.scrollTo(0, 0);
-    const mobile = navigator.userAgent.match(/(phone|iPhone|iPod|ios|Android|Mobile|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+    const mobile = navigator.userAgent.match(
+      /(phone|iPhone|iPod|ios|Android|Mobile|BrowserNG|WebOS|Symbian|Windows Phone)/i
+    );
     const deviceWidth = document.documentElement.clientWidth;
-    if(mobile)
-    {
+    if (mobile) {
       document.getElementById("reader").style.width = "94%";
-    }else if (deviceWidth > 1000) {
+    } else if (deviceWidth > 1000) {
       document.getElementById("reader").style.width = "750px";
     }
     this.readdata(
@@ -64,11 +68,25 @@ export default {
 
 <style scoped>
 #reader {
-  padding: 30px 3%;
-  width: 86%;
-  min-height: 40rem;
+  width: 70%;
   border-radius: 1px;
-  margin: -80px auto;
+  margin: 20px auto;
+}
+
+#title {
+  height: 3rem;
+  padding-top: 1rem;
+  padding-left: 1rem;
+  font-size: 1.4rem;
+  color: #fff;
+  border-radius: 5px 5px 0px 0px;
+  background-color: var(--main_color);
+  text-overflow: ellipsis;
+}
+
+#content {
+  padding: 30px 3%;
+  min-height: 50rem;
   background-color: var(--second_color);
   overflow-y: auto;
   overflow-x: auto;
@@ -82,14 +100,13 @@ export default {
 
 #goback {
   font-size: 1rem;
-  width: 8rem;
-  height: 2rem;
+  width: 3rem;
+  height: 3rem;
   float: right;
-  position: fixed;
+  position: relative;
   right: 30px;
   bottom: 20px;
   border-radius: 4rem;
-  opacity: 0.6;
   background-color: var(--main_color);
   color: var(--second_color);
   border: none;
